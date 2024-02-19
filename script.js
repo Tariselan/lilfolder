@@ -1,6 +1,6 @@
-// script.js
-let TODO = prompt("Enter your tasks seperated by commas").split(",");
+let todoMap;
 const centrediv = document.getElementById("centre");
+
 
 function click() {
     let audio = new Audio('click.wav');
@@ -12,51 +12,31 @@ function playDingSound() {
     audio.play();
 }
 
-
-let todoMap = TODO.reduce((acc, item) => {
-    acc[item] = false;
-    return acc;
-}, {})
-
-function createTaskElement(item) {
-    const newSpan = document.createElement("span");
-    newSpan.innerText = `${TODO.indexOf(item) + 1}. ${item} ${todoMap[item]}`;
-    newSpan.id = item;
-    return newSpan;
-}
-
-function renderTasks() {
-    TODO.forEach(item => {
-        const taskElement = createTaskElement(item);
-        centrediv.appendChild(taskElement);
-        centrediv.appendChild(document.createElement("br"));
-        centrediv.appendChild(document.createElement("div")).style.height = "30px";
-    });
-}
-
 function toggleTaskCompletion(taskElement) {
     const taskName = taskElement.id;
-    const span_parity = taskElement.innerText.slice(-5);
-
-    if (span_parity === "false") {
-        taskElement.innerText = taskElement.innerText.slice(0, -5) + "True";
-        taskElement.style.backgroundColor = "#4CAF50";
+    const completed = taskElement.dataset.completed === "true"; // Check completion statusc
+    console
+    if (!completed) {
+        // Task is not completed, mark it as completed
+        taskElement.style.backgroundColor = "#4CAF50"; // Change background color visually
         click();
+        taskElement.dataset.completed = "true"; // Update completion status
         todoMap[taskName] = true;
-        updateStatusBar();
+    } else {
+        // Task is completed, mark it as incomplete
+        taskElement.style.backgroundColor = "#AAA"; // Change background color visually
+        click();
+        taskElement.dataset.completed = "false"; // Update completion status
+        todoMap[taskName] = false;
     }
+
+    updateStatusBar();
 }
 
-centrediv.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.tagName === "SPAN") {
-        toggleTaskCompletion(target);
-    }
-});
 
 function updateStatusBar() {
-    const completedCount = Object.values(todoMap).filter(Boolean).length;
-    const totalCount = Object.keys(todoMap).length;
+    const completedCount = document.querySelectorAll('#centre [data-completed="true"]').length;
+    const totalCount = document.querySelectorAll('#centre [data-completed]').length;
     const percentage = (completedCount / totalCount) * 100;
 
     // Clamp the width between 0% and 100%
@@ -78,6 +58,32 @@ function updateStatusBar() {
     }
 }
 
+document.getElementById('task').addEventListener('click', function () {
+    let TODO = prompt("Enter your tasks separated by commas").split(",");
+    todoMap = {};
 
-renderTasks();
-updateStatusBar();
+    renderTasks();
+
+    function createTaskElement(item, index) {
+        const newSpan = document.createElement("span");
+        newSpan.innerText = `${index + 1}. ${item}`;
+        const taskId = `${item}_${Date.now()}`; // Generate a unique ID for the task
+        newSpan.id = taskId;
+        newSpan.dataset.completed = "false"; // Initialize the data attribute
+        return newSpan;
+    }
+
+    function renderTasks() {
+        centrediv.innerHTML = ""; // Clear previous tasks
+        TODO.forEach((item, index) => {
+            const taskElement = createTaskElement(item, index);
+            centrediv.appendChild(taskElement);
+            // Attach event listener for the newly created span
+            taskElement.addEventListener("click", () => {
+                toggleTaskCompletion(taskElement);
+            });
+        });
+    }
+
+    updateStatusBar();
+});
