@@ -7,11 +7,13 @@ span {
     background-color: #AAA;
     cursor: pointer;
     width: 100px;
+    text-align: center;
 }
 body {
     background-color: #666;
     margin: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
@@ -58,4 +60,22 @@ body {
     transform: translateX(-50%);
     width: auto;
     background-color: transparent;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    background-color: #666; /* Adjust background color if needed */
+}
+
+#div-btn {
+    text-align: center; /* Center button horizontally */
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
 }
